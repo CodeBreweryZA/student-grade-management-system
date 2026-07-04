@@ -4,21 +4,286 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Grade Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f0f2f5; }
-        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; max-width: 500px; }
-        h1 { color: #1a1a2e; margin-bottom: 10px; }
-        p { color: #666; line-height: 1.6; }
-        .btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin-top: 20px; }
-        .btn:hover { background: #1d4ed8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; color: #1e293b; }
+        .header { background: linear-gradient(135deg, #0f172a, #1e40af); color: white; padding: 25px; text-align: center; }
+        .header h1 { font-size: 1.6rem; margin-bottom: 5px; }
+        .header p { opacity: 0.85; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        h2 { font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        h2 i { color: #1e40af; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; color: #475569; font-size: 0.85rem; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #1e40af; color: white; }
+        .btn-primary:hover { background: #1e3a8a; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-warning:hover { background: #b45309; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .search-box { display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; color: #475569; font-weight: 600; position: sticky; top: 0; }
+        tr:hover { background: #f8fafc; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-A { background: #dcfce7; color: #166534; }
+        .badge-B { background: #dbeafe; color: #1e40af; }
+        .badge-C { background: #fef9c3; color: #854d0e; }
+        .badge-D { background: #fed7aa; color: #9a3412; }
+        .badge-F { background: #fecaca; color: #991b1b; }
+        .stat-card { background: #f8fafc; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid #e2e8f0; }
+        .stat-card .value { font-size: 1.6rem; font-weight: 700; color: #1e40af; }
+        .stat-card .label { font-size: 0.8rem; color: #64748b; margin-top: 3px; }
+        .alert { padding: 10px 15px; border-radius: 6px; margin: 10px 0; font-size: 0.85rem; }
+        .alert-success { background: #dcfce7; color: #166534; border-left: 4px solid #16a34a; }
+        .alert-error { background: #fef2f2; color: #991b1b; border-left: 4px solid #dc2626; }
+        .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #1e40af; }
+        .msg-area { min-height: 36px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 10px; padding: 25px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+        .modal h3 { margin-bottom: 15px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end; }
+        @media (max-width: 700px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Student Grade Management System</h1>
-        <p>A C++ application for managing student grades, calculating averages, and generating performance reports.</p>
-        <p>This is a command-line application. Visit the GitHub repository to view the source code.</p>
-        <a href="https://github.com/CodeBreweryZA/student-grade-management-system" class="btn" target="_blank">View on GitHub</a>
+    <div class="header">
+        <h1><i class="fas fa-graduation-cap"></i> Student Grade Management System</h1>
+        <p>Manage student records, calculate grades, save &amp; load data</p>
     </div>
+
+    <div class="container">
+        <div id="msg" class="msg-area"></div>
+
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add Student</h2>
+            <div class="grid">
+                <div class="form-group"><label>Student Number</label><input type="number" id="sNumber" placeholder="e.g. 1001"></div>
+                <div class="form-group"><label>First Name</label><input type="text" id="sFirstName" placeholder="First name"></div>
+                <div class="form-group"><label>Last Name</label><input type="text" id="sLastName" placeholder="Last name"></div>
+                <div class="form-group"><label>Age</label><input type="number" id="sAge" placeholder="Age" min="1" max="120"></div>
+                <div class="form-group"><label>Cell Number</label><input type="text" id="sCell" placeholder="Cell number"></div>
+                <div class="form-group"><label>Course</label>
+                    <select id="sCourse"><option value="Software Engineering">Software Engineering</option><option value="Computer Science">Computer Science</option><option value="Information Systems">Information Systems</option><option value="Data Science">Data Science</option><option value="Web Development">Web Development</option></select>
+                </div>
+                <div class="form-group"><label>Marks (0-100)</label><input type="number" id="sMarks" placeholder="0-100" min="0" max="100" step="0.1"></div>
+            </div>
+            <button class="btn btn-success" onclick="addStudent()"><i class="fas fa-save"></i> Add Student</button>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-search"></i> Search Students</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by name, number, or course..." onkeyup="searchStudents()">
+                <button class="btn btn-primary" onclick="searchStudents()"><i class="fas fa-search"></i> Search</button>
+                <button class="btn btn-sm" onclick="document.getElementById('searchInput').value='';searchStudents()"><i class="fas fa-times"></i> Clear</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex" style="justify-content:space-between;margin-bottom:10px;">
+                <h2 style="margin:0;"><i class="fas fa-users"></i> Student Records</h2>
+                <div class="flex">
+                    <button class="btn btn-warning btn-sm" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+                    <button class="btn btn-primary btn-sm" onclick="saveData()"><i class="fas fa-save"></i> Save</button>
+                    <button class="btn btn-sm" onclick="loadData()"><i class="fas fa-folder-open"></i> Load</button>
+                    <button class="btn btn-danger btn-sm" onclick="resetAll()"><i class="fas fa-trash"></i> Reset</button>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>#</th><th>Student #</th><th>Name</th><th>Age</th><th>Cell</th><th>Course</th><th>Marks</th><th>Grade</th><th>Actions</th></tr></thead>
+                    <tbody id="studentTable"></tbody>
+                </table>
+            </div>
+            <div class="grid-3" style="margin-top:15px;" id="statsRow"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h3><i class="fas fa-edit"></i> Edit Student</h3>
+            <input type="hidden" id="editIndex">
+            <div class="grid">
+                <div class="form-group"><label>Student Number</label><input type="number" id="editNumber"></div>
+                <div class="form-group"><label>First Name</label><input type="text" id="editFirstName"></div>
+                <div class="form-group"><label>Last Name</label><input type="text" id="editLastName"></div>
+                <div class="form-group"><label>Age</label><input type="number" id="editAge" min="1" max="120"></div>
+                <div class="form-group"><label>Cell Number</label><input type="text" id="editCell"></div>
+                <div class="form-group"><label>Course</label><select id="editCourse"><option>Software Engineering</option><option>Computer Science</option><option>Information Systems</option><option>Data Science</option><option>Web Development</option></select></div>
+                <div class="form-group"><label>Marks</label><input type="number" id="editMarks" min="0" max="100" step="0.1"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-sm" onclick="closeEdit()">Cancel</button>
+                <button class="btn btn-primary btn-sm" onclick="saveEdit()"><i class="fas fa-check"></i> Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let students = [];
+        const STORAGE_KEY = 'sgms_students';
+
+        function getGrade(marks) {
+            if (marks >= 75) return 'A';
+            if (marks >= 65) return 'B';
+            if (marks >= 55) return 'C';
+            if (marks >= 50) return 'D';
+            return 'F';
+        }
+
+        function msg(text, type) {
+            const el = document.getElementById('msg');
+            el.innerHTML = '<div class="alert alert-' + type + '">' + text + '</div>';
+            setTimeout(() => el.innerHTML = '', 4000);
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+            msg('Data saved to browser storage!', 'success');
+        }
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) { students = JSON.parse(raw); render(); msg('Data loaded from browser storage!', 'info'); }
+            else { msg('No saved data found.', 'error'); }
+        }
+
+        function exportCSV() {
+            if (students.length === 0) { msg('No students to export.', 'error'); return; }
+            let csv = 'Student Number,First Name,Last Name,Age,Cell Number,Course,Marks,Grade\n';
+            students.forEach(s => { csv += s.number + ',' + s.firstName + ',' + s.lastName + ',' + s.age + ',' + s.cell + ',' + s.course + ',' + s.marks + ',' + getGrade(s.marks) + '\n'; });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'students.csv'; a.click();
+            URL.revokeObjectURL(a.href);
+            msg('CSV exported!', 'success');
+        }
+
+        function resetAll() {
+            if (!confirm('Delete all student records?')) return;
+            students = []; localStorage.removeItem(STORAGE_KEY); render();
+            msg('All records deleted.', 'info');
+        }
+
+        function addStudent() {
+            const number = parseInt(document.getElementById('sNumber').value);
+            const firstName = document.getElementById('sFirstName').value.trim();
+            const lastName = document.getElementById('sLastName').value.trim();
+            const age = parseInt(document.getElementById('sAge').value);
+            const cell = document.getElementById('sCell').value.trim();
+            const course = document.getElementById('sCourse').value;
+            const marks = parseFloat(document.getElementById('sMarks').value);
+
+            if (!number) { msg('Please enter student number.', 'error'); return; }
+            if (!firstName || !lastName) { msg('Please enter first and last name.', 'error'); return; }
+            if (!age || age < 1) { msg('Please enter a valid age.', 'error'); return; }
+            if (!cell) { msg('Please enter cell number.', 'error'); return; }
+            if (isNaN(marks) || marks < 0 || marks > 100) { msg('Marks must be between 0 and 100.', 'error'); return; }
+
+            if (students.some(s => s.number === number)) { msg('Student number ' + number + ' already exists!', 'error'); return; }
+
+            students.push({ number, firstName, lastName, age, cell, course, marks });
+            render();
+            msg('Student "' + firstName + ' ' + lastName + '" added successfully!', 'success');
+            document.getElementById('sNumber').value = ''; document.getElementById('sFirstName').value = '';
+            document.getElementById('sLastName').value = ''; document.getElementById('sAge').value = '';
+            document.getElementById('sCell').value = ''; document.getElementById('sMarks').value = '';
+        }
+
+        function searchStudents() {
+            render(document.getElementById('searchInput').value.toLowerCase());
+        }
+
+        function render(filter) {
+            let list = students;
+            if (filter) {
+                list = students.filter(s => s.firstName.toLowerCase().includes(filter) || s.lastName.toLowerCase().includes(filter) || s.course.toLowerCase().includes(filter) || String(s.number).includes(filter));
+            }
+            const tbody = document.getElementById('studentTable');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:30px;">No students found. Add your first student above.</td></tr>';
+                document.getElementById('statsRow').innerHTML = '';
+                return;
+            }
+            let h = '';
+            list.forEach((s, i) => {
+                const idx = students.indexOf(s);
+                h += '<tr><td>' + (i+1) + '</td><td>' + s.number + '</td><td>' + s.firstName + ' ' + s.lastName + '</td><td>' + s.age + '</td><td>' + s.cell + '</td><td>' + s.course + '</td><td>' + s.marks + '</td><td><span class="badge badge-' + getGrade(s.marks) + '">' + getGrade(s.marks) + '</span></td><td><button class="btn btn-primary btn-sm" onclick="openEdit(' + idx + ')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteStudent(' + idx + ')"><i class="fas fa-trash"></i></button></td></tr>';
+            });
+            tbody.innerHTML = h;
+
+            const avg = students.reduce((a,s) => a + s.marks, 0) / students.length;
+            const top = Math.max(...students.map(s => s.marks));
+            const topStudent = students.find(s => s.marks === top);
+            const dists = students.filter(s => s.marks >= 75).length;
+            const passes = students.filter(s => s.marks >= 50 && s.marks < 75).length;
+            const fails = students.filter(s => s.marks < 50).length;
+
+            document.getElementById('statsRow').innerHTML =
+                '<div class="stat-card"><div class="value">' + students.length + '</div><div class="label">Total Students</div></div>' +
+                '<div class="stat-card"><div class="value">' + avg.toFixed(1) + '</div><div class="label">Average Score</div></div>' +
+                '<div class="stat-card"><div class="value">' + topStudent.firstName + ' ' + topStudent.lastName + '</div><div class="label">Top Performer (' + top + '%)</div></div>' +
+                '<div class="stat-card"><div class="value">' + dists + '</div><div class="label">Distinctions (A)</div></div>' +
+                '<div class="stat-card"><div class="value">' + passes + '</div><div class="label">Passes (B-D)</div></div>' +
+                '<div class="stat-card"><div class="value">' + fails + '</div><div class="label">Fails (F)</div></div>';
+        }
+
+        function openEdit(idx) {
+            const s = students[idx];
+            document.getElementById('editIndex').value = idx;
+            document.getElementById('editNumber').value = s.number;
+            document.getElementById('editFirstName').value = s.firstName;
+            document.getElementById('editLastName').value = s.lastName;
+            document.getElementById('editAge').value = s.age;
+            document.getElementById('editCell').value = s.cell;
+            document.getElementById('editCourse').value = s.course;
+            document.getElementById('editMarks').value = s.marks;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEdit() { document.getElementById('editModal').classList.remove('active'); }
+
+        function saveEdit() {
+            const idx = parseInt(document.getElementById('editIndex').value);
+            const number = parseInt(document.getElementById('editNumber').value);
+            const firstName = document.getElementById('editFirstName').value.trim();
+            const lastName = document.getElementById('editLastName').value.trim();
+            const age = parseInt(document.getElementById('editAge').value);
+            const cell = document.getElementById('editCell').value.trim();
+            const course = document.getElementById('editCourse').value;
+            const marks = parseFloat(document.getElementById('editMarks').value);
+
+            if (!number) { msg('Please enter student number.', 'error'); return; }
+            if (!firstName || !lastName) { msg('Please enter name.', 'error'); return; }
+            if (!age || age < 1) { msg('Invalid age.', 'error'); return; }
+            if (isNaN(marks) || marks < 0 || marks > 100) { msg('Marks 0-100.', 'error'); return; }
+
+            students[idx] = { number, firstName, lastName, age, cell, course, marks };
+            render(); closeEdit();
+            msg('Student updated successfully!', 'success');
+        }
+
+        function deleteStudent(idx) {
+            if (!confirm('Delete ' + students[idx].firstName + ' ' + students[idx].lastName + '?')) return;
+            students.splice(idx, 1); render();
+            msg('Student deleted.', 'info');
+        }
+
+        loadData();
+    </script>
 </body>
 </html>
